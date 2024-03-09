@@ -1,15 +1,85 @@
-"use client";
-import React from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
-export function SignupFormDemo() {
-  const handleFileChange = () => {};
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Form submitted");
+function SignupFormDemo() {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
+  const [passwordMismatch, setPasswordMismatch] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setImage(event.target.files[0]);
+    }
   };
+
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setPasswordMismatch(false);
+  };
+
+  const handleConfirmPasswordChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    setConfirmPassword(event.target.value);
+    setPasswordMismatch(false);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (password !== confirmPassword) {
+      setPasswordMismatch(true);
+      return;
+    }
+
+    // Create form data
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("picture", image || "");
+    // assuming image is File object
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/v1/users/signup",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to sign up");
+      }
+      console.log(response.ok);
+
+      // Reset form fields
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setImage(null);
+      navigate("/login");
+    } catch (error) {
+      setError(error.message || "Failed to sign up");
+    }
+  };
+
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black mt-9">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -20,59 +90,76 @@ export function SignupFormDemo() {
         yet
       </p>
 
-      {/* TODO: Add moving gradient maybe maybe? */}
-      {/* content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: var(--line-width);
-    background: conic-gradient(from calc(var(--angle) + var(--start-angle)), transparent 0, var(--line-color) 20%, transparent 25%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: inherit;
-
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    filter: drop-shadow(0 0 10px var(--line-color)); */}
       <form className="my-8" onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
-            <Label htmlFor="firstname">Name</Label>
-            <Input id="fullname" placeholder="Tyler" type="text" />
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              placeholder="Your Name"
+              type="text"
+              value={name}
+              onChange={handleNameChange}
+            />
           </LabelInputContainer>
         </div>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="profilePicture">Profile Picture</Label>
-          <Input
-            id="profilePicture"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-8">
-          <Label htmlFor="twitterpassword">Confirm password</Label>
-          <Input
-            id="twitterpassword"
-            placeholder="••••••••"
-            type="twitterpassword"
-          />
-        </LabelInputContainer>
+
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+              id="email"
+              placeholder="Your Email"
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+            />
+          </LabelInputContainer>
+        </div>
+
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              placeholder="Your Password"
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+          </LabelInputContainer>
+        </div>
+
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+            />
+            {passwordMismatch && (
+              <p className="text-red-500">Passwords do not match</p>
+            )}
+          </LabelInputContainer>
+        </div>
+
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="profilePicture">Profile Picture</Label>
+            <Input
+              id="profilePicture"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </LabelInputContainer>
+        </div>
 
         <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)inset,0px-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
           Sign up &rarr;
@@ -101,9 +188,12 @@ const LabelInputContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
+  const navigate = useNavigate();
   return (
     <div className={cn("flex flex-col space-y-2 w-full", className)}>
       {children}
     </div>
   );
 };
+
+export { SignupFormDemo };

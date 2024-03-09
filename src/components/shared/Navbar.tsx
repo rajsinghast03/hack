@@ -1,13 +1,15 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { user } from "./../shared/Login";
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     // Add your search logic here
-    console.log("Search term:", searchTerm);
+    navigate(`/category/${searchTerm}`);
+
     // Reset the search input
     setSearchTerm("");
   };
@@ -33,7 +35,7 @@ const Navbar = () => {
             placeholder="Search by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="mr-2 px-4 py-2 border rounded-full focus:outline-none focus:border-blue-500 "
+            className="mr-2 px-9 py-2 border rounded-full focus:outline-none focus:border-blue-500 w-full"
           />
           <button
             type="submit"
@@ -43,7 +45,14 @@ const Navbar = () => {
           </button>
         </form>
         <Link to="/" className="text-black text-lg font-bold">
-          User Image
+          {/* <div className="flex space-x-2 items-center justify-center">
+            <p className="text-light-4 font-semibold">{user?.name}</p>
+            <img
+              src={`http://localhost:8000/assests/${user?.picturePath}`}
+              height={36}
+              width={36}
+            />
+          </div> */}
         </Link>
       </div>
     </nav>
