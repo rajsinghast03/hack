@@ -2,7 +2,6 @@
 
 import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { useEffect, useState } from "react";
-const API_URL = "https://apis-new.foodoscope.com/recipe";
 
 interface RecipeOftheDayResponse {
   success: string;
