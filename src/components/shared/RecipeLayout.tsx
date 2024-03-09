@@ -21,11 +21,11 @@ function RecipeLayout() {
     async function fetchRecipes() {
       try {
         const response = await fetch(
-          `https://apis-new.foodoscope.com/recipe-search/recipe?searchText=${searchText}&pageSize=10`,
+          `https://apis-new.foodoscope.com/recipe-search/recipe?searchText=${searchText}&pageSize=18`,
           {
             headers: {
               Authorization:
-                "Bearer 0iukwZ9CyanPrXFMjVX7LKe8UoazZoZDDIVGFWYJq-7fCvb0",
+                "Bearer oZehDjdGlnBAR_sUbLkgrg-Xkg98UMv8AvA8IWun5QVkebFg",
               accept: "application/json",
             },
           }

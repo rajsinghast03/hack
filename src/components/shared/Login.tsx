@@ -2,8 +2,10 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
+import { UseDispatch, useDispatch } from "react-redux";
+import { setLogin } from "../../state/index.js";
 
-let user;
+// let user;
 
 export default function LoginFormDemo() {
   const [email, setEmail] = useState<string>("");
@@ -11,6 +13,7 @@ export default function LoginFormDemo() {
   const [error, setError] = useState<string>("");
 
   const navigate = useNavigate();
+  let dispatch = useDispatch();
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -32,22 +35,23 @@ export default function LoginFormDemo() {
         body: JSON.stringify({ email, password }),
       });
       const loggedIn = await response.json();
-      const usernew = await loggedIn.user;
-      console.log(loggedIn.user);
-      user = usernew;
-      console.log(user);
-      if (!response.ok) {
-        const { message } = await response.json();
-        throw new Error(message || "Failed to log in");
+      if (loggedIn.token === undefined) alert(loggedIn.message);
+      if (loggedIn) {
+        dispatch(
+          setLogin({
+            user: loggedIn.user,
+            token: loggedIn.token,
+          })
+        );
+
+        // Reset form fields
+        setEmail("");
+        setPassword("");
+        setError("");
+
+        // Redirect to homepage upon successful login
+        navigate("/");
       }
-
-      // Reset form fields
-      setEmail("");
-      setPassword("");
-      setError("");
-
-      // Redirect to homepage upon successful login
-      navigate("/");
     } catch (error) {
       setError(error.message || "Failed to log in");
     }
@@ -103,4 +107,4 @@ const BottomGradient = () => {
   );
 };
 
-export { user };
+// export { user };

@@ -32,32 +32,12 @@ const fetchData = async () => {
 };
 
 export default function Home() {
-  const [title, setTitle] = useState<string | undefined>(undefined);
-  const [imgUrl, setImgUrl] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchDataAndUpdateState = async () => {
-      try {
-        const { Recipe_title, img_url, cook_time, Calories } =
-          await fetchData();
-        setTitle(Recipe_title);
-        setImgUrl(img_url);
-        console.log(img_url);
-        // setTitle(payload?.);
-      } catch (error) {
-        // Handle the error if needed
-        console.error("Error in fetchDataAndUpdateState:", error);
-      }
-    };
-
-    fetchDataAndUpdateState();
-  }, []);
   return (
     <>
       <h1 className="font-bold text-5xl text-center text-slate-700 mt-10 mr-4">
         Browse our choices
       </h1>
-      <div className="max-w-8xl px-8">
+      <div className="max-w-screen-xl ">
         <HoverEffect items={categories} />
       </div>
     </>
